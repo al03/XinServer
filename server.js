@@ -36,8 +36,10 @@ wss.on('connection', function connecton(ws) {
 	});
 	var json = JSON.stringify(storage.data);
 	ws.send(json);
+
 });
 
+startHTTPServer();
 
 function printIP(port) {
 	var ip = require("ip");
@@ -45,4 +47,12 @@ function printIP(port) {
 	
 }
 
-
+function startHTTPServer() {
+	var express = require("express");
+	var app = express();
+	app.use('/', express.static(__dirname + '/build'));
+	app.listen(3000, function() {
+		var ip = require("ip");
+		console.log('open browser: http://%s:3000', ip.address());
+	});
+}
