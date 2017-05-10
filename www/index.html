@@ -1,0 +1,105 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Sample of web_socket.js</title>
+    <script src="http://www.chartjs.org/assets/Chart.min.js"></script>
+    <script type="text/javascript">
+        var ws;
+        var myLiveChar;
+
+        function init() {
+
+            // Connect to Web Socket.
+            ws = new WebSocket("ws://localhost:8080");
+
+            // Set event handlers.
+            ws.onopen = function() {
+                output("onopen");
+            };
+            ws.onmessage = function(e) {
+                // e.data contains received string.
+                console.log(e.data);
+                output("onmessage: " + e.data);
+                updateRate(e.data);
+            };
+            ws.onclose = function() {
+                output("onclose");
+            };
+            ws.onerror = function() {
+                output("onerror");
+            };
+
+
+            var canvas = document.getElementById('updating-chart'),
+                ctx = canvas.getContext('2d'),
+                startingData = {
+                    labels: ['', '', '', '', '', '', ''],
+                    datasets: [{
+                        fillColor: "rgba(151,187,205,0.2)",
+                        strokeColor: "rgba(151,187,205,1)",
+                        pointColor: "rgba(151,187,205,1)",
+                        pointStrokeColor: "#fff",
+                        data: [0, 0, 0, 0, 0, 0, 0]
+                    }]
+                },
+                latestLabel = startingData.labels[6];
+
+            // Reduce the animation steps for demo clarity.
+            myLiveChart = new Chart(ctx).Line(startingData, {
+                animationSteps: 15
+            });
+
+        }
+
+        function updateRate(rate) {
+            var rateInt = parseInt(rate);
+            if (!rateInt) {
+                return
+            }
+            // Add two random numbers for each dataset
+            myLiveChart.addData([rateInt], '');
+            // Remove the first point so we dont just add values forever
+            myLiveChart.removeData();
+
+            console.log(typeof rateInt + rateInt)
+        }
+
+        function onSubmit() {
+            var input = document.getElementById("input");
+            ws.send(input.value);
+            output("send: " + input.value);
+            input.value = "";
+            input.focus();
+        }
+
+        function onCloseClick() {
+            ws.close();
+        }
+
+        function output(str) {
+            var log = document.getElementById("log");
+            var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").
+            replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
+            log.innerHTML = escaped + "<br>" + log.innerHTML;
+        }
+    </script>
+    <style>
+        .chart {
+            width: 100%;
+            display: block;
+        }
+    </style>
+</head>
+
+<body onload="init();">
+    <canvas id="updating-chart" class="chart"></canvas>
+    <form onsubmit="onSubmit(); return false;">
+        <input type="text" id="input">
+        <input type="submit" value="Send">
+        <button onclick="onCloseClick(); return false;">close</button>
+    </form>
+    <div id="log"></div>
+</body>
+
+</html>
