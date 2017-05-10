@@ -15,10 +15,10 @@ var sourceWS;
 wss.on('connection', function connecton(ws) {
 
     console.log("new connection");
-        if (this.sourceWS == null) {
-            this.sourceWS = ws;
-            startHTTPServer();
-        }
+    if (this.sourceWS == null) {
+        this.sourceWS = ws;
+        startHTTPServer();
+    }
 
 
     ws.on('message', function incoming(message) {
