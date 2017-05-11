@@ -2,7 +2,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Sample of web_socket.js</title>
+    <title>Heart Rate</title>
     <script src="http://www.chartjs.org/assets/Chart.min.js"></script>
     <script type="text/javascript">
         var ws;
@@ -30,9 +30,9 @@
                 output("onerror");
             };
 
-
             var canvas = document.getElementById('updating-chart'),
                 ctx = canvas.getContext('2d'),
+
                 startingData = {
                     labels: ['', '', '', '', '', '', ''],
                     datasets: [{
@@ -40,13 +40,21 @@
                         strokeColor: "rgba(151,187,205,1)",
                         pointColor: "rgba(151,187,205,1)",
                         pointStrokeColor: "#fff",
-                        data: [0, 0, 0, 0, 0, 0, 0]
+                        data: [60, 60, 60, 60, 60, 60, 60]
                     }]
                 },
                 latestLabel = startingData.labels[6];
 
+
             // Reduce the animation steps for demo clarity.
-            myLiveChart = new Chart(ctx).Line(startingData, {
+            myLiveChart = new Chart(ctx, {
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    showScale: true,
+                }
+
+            }).Line(startingData, {
                 animationSteps: 15
             });
 
@@ -85,14 +93,20 @@
         }
     </script>
     <style>
-        .chart {
+        html,
+        body {
             width: 100%;
-            display: block;
+            height: 100%;
+        }
+        
+        .chart {
+            width: 95vw;
+            height: 90vh;
         }
     </style>
 </head>
 
-<body onload="init();">
+<body onload="init()">
     <canvas id="updating-chart" class="chart"></canvas>
     <form onsubmit="onSubmit(); return false;">
         <input type="text" id="input">
